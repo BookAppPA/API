@@ -309,7 +309,7 @@ app.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
 
 
 // Delete Book From Gallery of User
-app.post('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) => {
+app.delete('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) => {
   (async () => {
     try {
       await db.collection('books_users').doc(`${req.headers.uid}-${req.body['bookid']}`)
@@ -367,55 +367,6 @@ app.get('/api/bdd/userListRatings', checkIfAuthenticated, (req, res) => {
         }
       }
       return res.status(200).send(ratings);
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send(error);
-    }
-  })();
-});
-
-
-
-// read item
-app.get('/api/readBookID/:item_id', checkIfAuthenticated, (req, res) => {
-  (async () => {
-    try {
-      const document = db.collection('items').doc(req.params.item_id);
-      let item = await document.get();
-      let response = item.data();
-      return res.status(200).send(response);
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send(error);
-    }
-  })();
-});
-
-
-
-// update
-app.put('/api/update/:item_id', checkIfAuthenticated, (req, res) => {
-  (async () => {
-    try {
-      const document = db.collection('items').doc(req.params.item_id);
-      await document.update({
-        item: req.body.item
-      });
-      return res.status(200).send();
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send(error);
-    }
-  })();
-});
-
-// delete
-app.delete('/api/delete/:item_id', checkIfAuthenticated, (req, res) => {
-  (async () => {
-    try {
-      const document = db.collection('items').doc(req.params.item_id);
-      await document.delete();
-      return res.status(200).send();
     } catch (error) {
       console.log(error);
       return res.status(500).send(error);
