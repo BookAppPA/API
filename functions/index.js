@@ -252,6 +252,46 @@ app.get('/api/bdd/searchBook', checkIfAuthenticated, (req, res) => {
   })();
 });
 
+// get search books by author
+app.get('/api/bdd/searchBooksByAuthor', checkIfAuthenticated, (req, res) => {
+  (async () => {
+    try {
+      let search = req.headers.search.replace(" ", "+");
+      let url = `${baseUrlGoogleBooksAPI}volumes?q=inauthor:${search}&filter=partial&maxResults=2`;
+      requestExternalAPI(url, function (error, response, body) {
+        if (error) {
+          console.log('error:', error);
+          return res.status(500).send(error.toJSON());
+        } else {
+          let books = JSON.parse(body);
+          return res.status(200).send(books.items);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error.toJSON());
+    }
+  })();
+});
+
+// get search users
+app.get('/api/bdd/searchUsers', checkIfAuthenticated, (req, res) => {
+  (async () => {
+    try {
+      let users = [];
+      let snap = await db.collection('users').where("pseudo", "==", req.headers.search).get();
+      let docs = snap.docs;
+      for (let doc of docs) {
+        users.push(doc.data());
+      }
+      return res.status(200).send(users);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error.toJSON());
+    }
+  })();
+});
+
 // get list user books
 app.get('/api/bdd/userListBooks/:user_id', checkIfAuthenticated, (req, res) => {
   (async () => {
