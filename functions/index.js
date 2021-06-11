@@ -279,7 +279,7 @@ app.get('/api/bdd/searchUsers', checkIfAuthenticated, (req, res) => {
   (async () => {
     try {
       let users = [];
-      let snap = await db.collection('users').where("pseudo", "==", req.headers.search).get();
+      let snap = await db.collection('users').where("pseudo", "==", req.headers.search).where("isBlocked", "==", false).get();
       let docs = snap.docs;
       for (let doc of docs) {
         users.push(doc.data());
