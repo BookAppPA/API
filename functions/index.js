@@ -415,4 +415,42 @@ app.get('/api/bdd/userListRatings', checkIfAuthenticated, (req, res) => {
 });
 
 
+// get init list booksellers
+app.get('/api/bdd/getInitListBookSeller', checkIfAuthenticated, (req, res) => {
+  (async () => {
+    try {
+      let booksSellers = [];
+      let snap = await db.collection('bookseller').orderBy("timestamp", "desc").limit(5).get();
+      let docs = snap.docs;
+        for (let doc of docs) {
+          booksSellers.push(doc.data());
+        }
+      return res.status(200).send(booksSellers);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  })();
+});
+
+
+// get search bookSeller
+app.get('/api/bdd/searchBookSeller', checkIfAuthenticated, (req, res) => {
+  (async () => {
+    try {
+      let booksellers = [];
+      let snap = await db.collection('bookseller').where("name", "==", req.headers.search).get();
+      let docs = snap.docs;
+      for (let doc of docs) {
+        booksellers.push(doc.data());
+      }
+      return res.status(200).send(booksellers);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error.toJSON());
+    }
+  })();
+});
+
+
 exports.app = functions.https.onRequest(app);
