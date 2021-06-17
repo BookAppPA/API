@@ -453,4 +453,23 @@ app.get('/api/bdd/searchBookSeller', checkIfAuthenticated, (req, res) => {
 });
 
 
+// get list books week by bookSeller ID
+app.get('/api/bdd/getListBooksWeek/:bookseller_id', checkIfAuthenticated, (req, res) => {
+  (async () => {
+    try {
+      let booksWeek = [];
+      let snap = await db.collection('bookweek').doc(req.params.bookseller_id).collection("books").orderBy("timestamp", "desc").limit(5).get();
+      let docs = snap.docs;
+      for (let doc of docs) {
+        booksWeek.push(doc.data());
+      }
+      return res.status(200).send(booksWeek);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error.toJSON());
+    }
+  })();
+});
+
+
 exports.app = functions.https.onRequest(app);
