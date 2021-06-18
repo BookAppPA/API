@@ -15,7 +15,7 @@ router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => 
             return res.status(200).send();
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -24,11 +24,21 @@ router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => 
 router.get('/api/bdd/getUserById/:user_id', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            const doc = await db.collection('users').doc(req.params.user_id).get();
-            return res.status(200).send(doc.data());
+            var doc = await db.collection('users').doc(req.params.user_id).get();
+            var map = {
+                "type": "user"
+            };
+            if (doc.data() == undefined) {
+                doc = await db.collection('bookseller').doc(req.params.user_id).get();
+                map = {
+                    "type": "bookseller"
+                };
+            }
+            map["data"] = doc.data();
+            return res.status(200).send(map);
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -47,7 +57,7 @@ router.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
             return res.status(200).send();
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -62,7 +72,7 @@ router.delete('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res)
             return res.status(200).send();
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });

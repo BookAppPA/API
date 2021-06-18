@@ -18,7 +18,7 @@ router.get('/api/bdd/popularBooks', (req, res) => {
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log('error:', error);
-                    return res.status(500).send(error.toJSON());
+                    return res.status(500).send(error);
                 } else {
                     let books = JSON.parse(body);
                     return res.status(200).send(books.items);
@@ -26,7 +26,7 @@ router.get('/api/bdd/popularBooks', (req, res) => {
             });
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -39,14 +39,14 @@ router.get('/api/bdd/bookDetail/:book_id', checkIfAuthenticated, (req, res) => {
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log('error:', error);
-                    return res.status(500).send(error.toJSON());
+                    return res.status(500).send(error);
                 } else {
                     return res.status(200).send(JSON.parse(body));
                 }
             });
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });

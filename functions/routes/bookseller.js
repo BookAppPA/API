@@ -38,7 +38,7 @@ router.get('/api/bdd/getInitListBookSeller', checkIfAuthenticated, (req, res) =>
         return res.status(200).send(booksWeek);
       } catch (error) {
         console.log(error);
-        return res.status(500).send(error.toJSON());
+        return res.status(500).send(error);
       }
     })();
   });

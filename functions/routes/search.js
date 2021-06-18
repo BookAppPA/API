@@ -18,7 +18,7 @@ router.get('/api/bdd/searchBook', checkIfAuthenticated, (req, res) => {
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log('error:', error);
-                    return res.status(500).send(error.toJSON());
+                    return res.status(500).send(error);
                 } else {
                     let books = JSON.parse(body);
                     return res.status(200).send(books.items);
@@ -26,7 +26,7 @@ router.get('/api/bdd/searchBook', checkIfAuthenticated, (req, res) => {
             });
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -40,7 +40,7 @@ router.get('/api/bdd/searchBooksByAuthor', checkIfAuthenticated, (req, res) => {
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log('error:', error);
-                    return res.status(500).send(error.toJSON());
+                    return res.status(500).send(error);
                 } else {
                     let books = JSON.parse(body);
                     return res.status(200).send(books.items);
@@ -48,7 +48,7 @@ router.get('/api/bdd/searchBooksByAuthor', checkIfAuthenticated, (req, res) => {
             });
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -66,7 +66,7 @@ router.get('/api/bdd/searchUsers', checkIfAuthenticated, (req, res) => {
             return res.status(200).send(users);
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
@@ -84,7 +84,7 @@ router.get('/api/bdd/searchBookSeller', checkIfAuthenticated, (req, res) => {
             return res.status(200).send(booksellers);
         } catch (error) {
             console.log(error);
-            return res.status(500).send(error.toJSON());
+            return res.status(500).send(error);
         }
     })();
 });
