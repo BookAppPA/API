@@ -51,5 +51,12 @@ app.use(rating);
 const bookseller = require('./routes/bookseller.js');
 app.use(bookseller); 
 
+// Get Date Server
+app.get('/api/dateServer', (req, res) => {
+  (async () => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
+  })();
+});
 
 exports.app = functions.https.onRequest(app);

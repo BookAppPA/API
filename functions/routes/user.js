@@ -16,6 +16,9 @@ router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => 
                 if (data["open_hour"] != undefined) {
                     data["open_hour"] = JSON.parse(data["open_hour"]);
                 }
+                if (data["dateNextAddBookWeek"] != undefined) {
+                    data["dateNextAddBookWeek"] = new Date(data["dateNextAddBookWeek"]);
+                }
                 await db.collection('bookseller').doc(req.params.user_id)
                 .set(data, { merge: true });
             } else {
