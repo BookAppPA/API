@@ -10,8 +10,18 @@ const checkIfAuthenticated = middleware.checkIfAuthenticated;
 router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            await db.collection('users').doc(req.params.user_id)
+            const isBookSeller = req.headers.isbookseller == "true";
+            if (isBookSeller) {
+                const data = req.body;
+                if (data["open_hour"] != undefined) {
+                    data["open_hour"] = JSON.parse(data["open_hour"]);
+                }
+                await db.collection('bookseller').doc(req.params.user_id)
+                .set(data, { merge: true });
+            } else {
+                await db.collection('users').doc(req.params.user_id)
                 .set(req.body, { merge: true });
+            }
             return res.status(200).send();
         } catch (error) {
             console.log(error);
