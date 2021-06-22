@@ -25,6 +25,7 @@ router.post('/api/auth/signup', (req, res) => {
                 uid: user.uid,
                 email: req.body.email,
                 pseudo: req.body.pseudo,
+                isBlocked: false,
             }, { merge: true });
             return res.status(200).send(user);
         } catch (error) {
