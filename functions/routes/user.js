@@ -103,7 +103,42 @@ router.post('/api/bdd/followUser/:user_id_to_follow', checkIfAuthenticated, (req
             await db.collection('users').doc(req.params.user_id_to_follow).collection("followers").doc(req.headers.uid)
                 .set(userSrc, { merge: true });
             await db.collection('users').doc(req.params.user_id_to_follow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
             return res.status(200).send();
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    })();
+});
+
+// Delete Follow of User
+router.delete('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, (req, res) => {
+    (async () => {
+        try {
+            await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
+                .delete();
+            await db.collection('users').doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
+                .delete();
+            await db.collection('users').doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
+            return res.status(200).send();
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    })();
+});
+
+// Check if user is Follow
+router.get('/api/bdd/isFollow/:user_id', checkIfAuthenticated, (req, res) => {
+    (async () => {
+        try {
+            const doc = await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id)
+                .get();
+            return res.status(200).send({
+                "status": doc.data() != undefined
+            });
         } catch (error) {
             console.log(error);
             return res.status(500).send(error);
@@ -129,38 +164,22 @@ router.get('/api/bdd/getListFollowers/:user_id', checkIfAuthenticated, (req, res
     })();
 });
 
-// Delete Follow of User
-router.delete('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, (req, res) => {
+// get list following by user ID
+router.get('/api/bdd/getListFollowing/:user_id', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
-                .delete();
-            await db.collection('users').doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
-                .delete();
-            await db.collection('users').doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
-            return res.status(200).send();
+            let following = [];
+            let snap = await db.collection('users').doc(req.params.user_id).collection("following").orderBy("timestamp", "desc").limit(5).get();
+            let docs = snap.docs;
+            for (let doc of docs) {
+                following.push(doc.data());
+            }
+            return res.status(200).send(following);
         } catch (error) {
             console.log(error);
             return res.status(500).send(error);
         }
     })();
 });
-
-// Check if user is Follow
-router.get('/api/bdd/isFollow/:user_id', checkIfAuthenticated, (req, res) => {
-    (async () => {
-        try {
-            const doc = await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id)
-                .get();
-            return res.status(200).send({
-                "status": doc.data() != undefined
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(500).send(error);
-        }
-    })();
-});
-
 
 module.exports = router
