@@ -74,24 +74,6 @@ router.get('/api/bdd/getAllUsers', checkIfAuthenticated, (req, res) => {
     })();
 });
 
-//get all users in app
-router.get('/api/bdd/getAllUsers', checkIfAuthenticated, (req, res) => {
-    (async () => {
-        try {
-            const users = [];
-            const doc = await db.collection('users').get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    users.push(doc.data());
-                })
-            })
-            return res.status(200).send(users);
-        } catch (error) {
-            console.log(error);
-            return res.status(500).send(error.toJSON());
-        }
-    })();
-});
-
 // Add Book to Gallery of User
 router.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
     (async () => {
