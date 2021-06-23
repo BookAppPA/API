@@ -17,6 +17,8 @@ router.get('/api/bdd/ratingByBook/:book_id', checkIfAuthenticated, (req, res) =>
             if (result != null && result != undefined) {
                 map["nbRatings"] = result["nbRatings"];
                 map["note"] = result["note"];
+                map["book_title"] = result["book_title"];
+                map["book_pic"] = result["book_pic"];
                 let snap = await db.collection('ratings').doc(req.params.book_id).collection("comments").orderBy("timestamp", "desc").limit(5).get();
                 let docs = snap.docs;
                 for (let doc of docs) {
