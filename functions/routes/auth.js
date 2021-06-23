@@ -21,13 +21,14 @@ router.post('/api/auth/signup', (req, res) => {
                 password: req.body.password,
                 displayName: req.body.pseudo,
             });
-            await db.collection('users').doc(user.uid).set({
+            const map = {
                 uid: user.uid,
                 email: req.body.email,
                 pseudo: req.body.pseudo,
                 isBlocked: false,
-            }, { merge: true });
-            return res.status(200).send(user);
+            };
+            await db.collection('users').doc(user.uid).set(map, { merge: true });
+            return res.status(200).send(map);
         } catch (error) {
             console.log(error);
             return res.status(500).send(error);
