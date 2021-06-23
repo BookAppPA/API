@@ -95,7 +95,7 @@ router.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
 
 
 // Delete Book From Gallery of User
-router.delete('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) => {
+router.post('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await db.collection('books_users').doc(`${req.headers.uid}-${req.body['bookid']}`)
@@ -131,7 +131,7 @@ router.post('/api/bdd/followUser/:user_id_to_follow', checkIfAuthenticated, (req
 });
 
 // Delete Follow of User
-router.delete('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, (req, res) => {
+router.post('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
