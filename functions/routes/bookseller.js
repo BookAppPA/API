@@ -6,6 +6,19 @@ const router = express.Router();
 const db = admin.firestore();
 const checkIfAuthenticated = middleware.checkIfAuthenticated;
 
+// get user by id
+router.get('/api/bdd/getBookSellerById/:bookseller_id', checkIfAuthenticated, (req, res) => {
+    (async () => {
+        try {
+            doc = await db.collection('bookseller').doc(req.params.bookseller_id).get();
+            return res.status(200).send(doc.data());
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    })();
+});
+
 // get init list booksellers
 router.get('/api/bdd/getInitListBookSeller', checkIfAuthenticated, (req, res) => {
     (async () => {

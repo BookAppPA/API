@@ -116,11 +116,14 @@ router.post('/api/bdd/followUser/:user_id_to_follow', checkIfAuthenticated, (req
             userDest["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
             await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_follow)
                 .set(userDest, { merge: true });
-            const userSrc = JSON.parse(req.body["userSrc"]);
-            userSrc["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
-            await db.collection('users').doc(req.params.user_id_to_follow).collection("followers").doc(req.headers.uid)
-                .set(userSrc, { merge: true });
-            await db.collection('users').doc(req.params.user_id_to_follow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            console.log(userDest["isBookSeller"]);
+            if (!userDest["isBookSeller"]) {
+                const userSrc = JSON.parse(req.body["userSrc"]);
+                userSrc["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
+                await db.collection('users').doc(req.params.user_id_to_follow).collection("followers").doc(req.headers.uid)
+                    .set(userSrc, { merge: true });
+            }
+            await db.collection(userDest["isBookSeller"] ? 'bookseller' : 'users').doc(req.params.user_id_to_follow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
             await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
             return res.status(200).send();
         } catch (error) {
@@ -136,9 +139,13 @@ router.post('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, 
         try {
             await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
                 .delete();
-            await db.collection('users').doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
+            if (!req.body["isBookSeller"]) {
+                await db.collection('users').doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
                 .delete();
-            await db.collection('users').doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            }
+            console.log(req.body["nbFollowers"]);
+            console.log(req.body["nbFollowing"]);
+            await db.collection(req.body["isBookSeller"] ? 'bookseller' : 'users').doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
             await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
             return res.status(200).send();
         } catch (error) {
