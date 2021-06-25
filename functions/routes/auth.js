@@ -86,7 +86,7 @@ router.get('/api/auth/checkSiret', (req, res) => {
                     return res.status(500).send(error);
                 } else {
                     let bookseller = JSON.parse(body);
-                    return res.status(200).send(bookseller.siege_social);
+                    return res.status(200).send(bookseller.etablissement);
                 }
             });
         } catch (error) {
@@ -121,6 +121,11 @@ router.get('/api/auth/checkSiren', (req, res) => {
 router.post('/api/auth/signupBookSeller', (req, res) => {
     (async () => {
         try {
+            const snap = await db.collection('bookseller').where("siret" , "==", req.body.siret).limit(1).get();
+            let docs = snap.docs;
+            if (docs.length > 0) {
+                return res.status(501).send({"code": "siret/invalidate"});
+            }
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(
                 req.body.email,
                 req.headers.password,
