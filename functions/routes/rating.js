@@ -65,12 +65,25 @@ router.post('/api/bdd/addRating/:book_id', checkIfAuthenticated, (req, res) => {
             data["rating"]["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
             await db.collection('ratings').doc(req.params.book_id).collection("comments").doc(req.headers.uid).set(data['rating']);
             const doc = await db.collection('ratings').doc(req.params.book_id).get();
-            const nbRatings = doc.data()["nbRatings"];
-            const noteGlobal = doc.data()["note"];
+            const nbRatings = 0;
+            const noteGlobal = 0;
+            if (doc.data() == undefined) {
+                await db.collection('ratings').doc(req.params.book_id).set({
+                    "book_pic": data["rating"]["book_pic"],
+                    "book_title": data["rating"]["book_title"],
+                    "id": req.params.book_id,
+                    "nbRatings": 0,
+                    "note": 0,
+                });
+            } else {
+                nbRatings = doc.data()["nbRatings"];
+                noteGlobal = doc.data()["note"];
+            }
+
             var noteFinal = ((noteGlobal * nbRatings) + data["rating"]["note"]) / (nbRatings + 1);
             noteFinal = Math.round(noteFinal * 2) / 2;
-            await db.collection('ratings').doc(req.params.book_id).set({"nbRatings": nbRatings + 1, "note": parseFloat(noteFinal.toString())}, {merge: true});
-            await db.collection('users').doc(req.headers.uid).set({"nbRatings": data["user_nbRatings"] + 1}, {merge: true});
+            await db.collection('ratings').doc(req.params.book_id).set({ "nbRatings": nbRatings + 1, "note": parseFloat(noteFinal.toString()) }, { merge: true });
+            await db.collection('users').doc(req.headers.uid).set({ "nbRatings": data["user_nbRatings"] + 1 }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
@@ -83,7 +96,7 @@ router.post('/api/bdd/addRating/:book_id', checkIfAuthenticated, (req, res) => {
 router.put('/api/bdd/modifyRating/:book_id', checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            await db.collection('ratings').doc(req.params.book_id).collection("comments").doc(req.headers.uid).set(req.body, {merge: true});
+            await db.collection('ratings').doc(req.params.book_id).collection("comments").doc(req.headers.uid).set(req.body, { merge: true });
             return res.status(200).send();
         } catch (error) {
             return res.status(500).send(error);
@@ -97,15 +110,17 @@ router.delete('/api/bdd/deleteRating/:book_id', checkIfAuthenticated, (req, res)
     (async () => {
         try {
             let data = req.body;
-            const snap = await db.collection('ratings').doc(req.params.book_id).collection("comments").doc(req.headers.uid).delete();
+            await db.collection('ratings').doc(req.params.book_id).collection("comments").doc(req.headers.uid).delete();
             const noteRating = data["note"];
             const doc = await db.collection('ratings').doc(req.params.book_id).get();
-            const nbRatings = doc.data()["nbRatings"];
-            const noteGlobal = doc.data()["note"];
-            var noteFinal = ((noteGlobal * nbRatings) - noteRating) / (nbRatings - 1);
-            noteFinal = Math.round(noteFinal * 2) / 2;
-            await db.collection('ratings').doc(req.params.book_id).set({"nbRatings": nbRatings - 1, "note": parseFloat(noteFinal.toString())}, {merge: true});
-            await db.collection('users').doc(req.headers.uid).set({"nbRatings": data["user_nbRatings"] - 1}, {merge: true});
+            if (doc.data() != undefined) {
+                const nbRatings = doc.data()["nbRatings"];
+                const noteGlobal = doc.data()["note"];
+                var noteFinal = ((noteGlobal * nbRatings) - noteRating) / (nbRatings - 1);
+                noteFinal = Math.round(noteFinal * 2) / 2;
+                await db.collection('ratings').doc(req.params.book_id).set({ "nbRatings": nbRatings - 1, "note": parseFloat(noteFinal.toString()) }, { merge: true });
+            }
+            await db.collection('users').doc(req.headers.uid).set({ "nbRatings": data["user_nbRatings"] - 1 }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
