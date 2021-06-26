@@ -1,8 +1,8 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const firebase = require('firebase');
-const express = require('express');
-const cors = require('cors');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const firebase = require("firebase");
+const express = require("express");
+const cors = require("cors");
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -33,30 +33,33 @@ firebase.initializeApp(config);
 const app = express();
 app.use(cors({ origin: true }));
 
-const auth = require('./routes/auth.js');
-app.use(auth);
+const authR = require("./routes/auth.js");
+const auth = app.use(authR);
 
-const user = require('./routes/user.js');
-app.use(user); 
+const userR = require("./routes/user.js");
+const user = app.use(userR); 
 
-const book = require('./routes/book.js');
-app.use(book); 
+const bookR = require("./routes/book.js");
+const book = app.use(bookR); 
 
-const search = require('./routes/search.js');
-app.use(search); 
+const searchR = require("./routes/search.js");
+const search = app.use(searchR); 
 
-const rating = require('./routes/rating.js');
-app.use(rating); 
+const ratingR = require("./routes/rating.js");
+const rating = app.use(ratingR); 
 
-const bookseller = require('./routes/bookseller.js');
-app.use(bookseller); 
+const booksellerR = require("./routes/bookseller.js");
+const bookseller = app.use(booksellerR); 
 
 // Get Date Server
-app.get('/api/dateServer', (req, res) => {
-  (async () => {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
-  })();
+exports.dateServer = functions.region("europe-west3").https.onRequest((request, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
 });
 
-exports.app = functions.https.onRequest(app);
+exports.auth = functions.region("europe-west3").https.onRequest(auth);
+exports.book = functions.region("europe-west3").https.onRequest(book);
+exports.user = functions.region("europe-west3").https.onRequest(user);
+exports.search = functions.region("europe-west3").https.onRequest(search);
+exports.rating = functions.region("europe-west3").https.onRequest(rating);
+exports.bookseller = functions.region("europe-west3").https.onRequest(bookseller);

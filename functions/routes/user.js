@@ -1,13 +1,13 @@
-const express = require('express');
-const middleware = require('../src/middleware.js');
-const admin = require('firebase-admin');
+const express = require("express");
+const middleware = require("../src/middleware.js");
+const admin = require("firebase-admin");
 const router = express.Router();
 
 const db = admin.firestore();
 const checkIfAuthenticated = middleware.checkIfAuthenticated;
 
 // Update user
-router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => {
+router.put("/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const isBookSeller = req.headers.isbookseller == "true";
@@ -19,10 +19,10 @@ router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => 
                 if (data["dateNextAddBookWeek"] != undefined) {
                     data["dateNextAddBookWeek"] = new Date(data["dateNextAddBookWeek"]);
                 }
-                await db.collection('bookseller').doc(req.params.user_id)
+                await db.collection("bookseller").doc(req.params.user_id)
                     .set(data, { merge: true });
             } else {
-                await db.collection('users').doc(req.params.user_id)
+                await db.collection("users").doc(req.params.user_id)
                     .set(req.body, { merge: true });
             }
             return res.status(200).send();
@@ -34,15 +34,15 @@ router.put('/api/auth/updateUser/:user_id', checkIfAuthenticated, (req, res) => 
 });
 
 // get user by id
-router.get('/api/bdd/getUserById/:user_id', checkIfAuthenticated, (req, res) => {
+router.get("/getUserById/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            var doc = await db.collection('users').doc(req.params.user_id).get();
+            var doc = await db.collection("users").doc(req.params.user_id).get();
             var map = {
                 "type": "user"
             };
             if (doc.data() == undefined) {
-                doc = await db.collection('bookseller').doc(req.params.user_id).get();
+                doc = await db.collection("bookseller").doc(req.params.user_id).get();
                 map = {
                     "type": "bookseller"
                 };
@@ -57,11 +57,11 @@ router.get('/api/bdd/getUserById/:user_id', checkIfAuthenticated, (req, res) => 
 });
 
 //get all users in app
-router.get('/api/bdd/getAllUsers', checkIfAuthenticated, (req, res) => {
+router.get("/getAllUsers", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const users = [];
-            const doc = await db.collection('users').get().then((querySnapshot) => {
+            const doc = await db.collection("users").get().then((querySnapshot) => {
                 querySnapshot.forEach((doc) => {
                     users.push(doc.data());
                 })
@@ -75,15 +75,15 @@ router.get('/api/bdd/getAllUsers', checkIfAuthenticated, (req, res) => {
 });
 
 // Add Book to Gallery of User
-router.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
+router.post("/addBookToGallery", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = {
-                "book_id": req.body['bookid'],
+                "book_id": req.body["bookid"],
                 "user_id": req.headers.uid,
                 "timestamp": admin.firestore.FieldValue.serverTimestamp()
             };
-            await db.collection('books_users').doc(`${req.headers.uid}-${req.body['bookid']}`)
+            await db.collection("books_users").doc(`${req.headers.uid}-${req.body["bookid"]}`)
                 .set(data, { merge: true });
             return res.status(200).send();
         } catch (error) {
@@ -95,10 +95,10 @@ router.post('/api/bdd/addBookToGallery', checkIfAuthenticated, (req, res) => {
 
 
 // Delete Book From Gallery of User
-router.post('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) => {
+router.post("/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            await db.collection('books_users').doc(`${req.headers.uid}-${req.body['bookid']}`)
+            await db.collection("books_users").doc(`${req.headers.uid}-${req.body["bookid"]}`)
                 .delete();
             return res.status(200).send();
         } catch (error) {
@@ -109,22 +109,22 @@ router.post('/api/bdd/deleteBookFromGallery', checkIfAuthenticated, (req, res) =
 });
 
 // Follow User
-router.post('/api/bdd/followUser/:user_id_to_follow', checkIfAuthenticated, (req, res) => {
+router.post("/followUser/:user_id_to_follow", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const userDest = JSON.parse(req.body["userDest"]);
             userDest["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
-            await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_follow)
+            await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id_to_follow)
                 .set(userDest, { merge: true });
             console.log(userDest["isBookSeller"]);
             if (!userDest["isBookSeller"]) {
                 const userSrc = JSON.parse(req.body["userSrc"]);
                 userSrc["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
-                await db.collection('users').doc(req.params.user_id_to_follow).collection("followers").doc(req.headers.uid)
+                await db.collection("users").doc(req.params.user_id_to_follow).collection("followers").doc(req.headers.uid)
                     .set(userSrc, { merge: true });
             }
-            await db.collection(userDest["isBookSeller"] ? 'bookseller' : 'users').doc(req.params.user_id_to_follow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
-            await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
+            await db.collection(userDest["isBookSeller"] ? "bookseller" : "users").doc(req.params.user_id_to_follow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            await db.collection("users").doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
@@ -134,19 +134,19 @@ router.post('/api/bdd/followUser/:user_id_to_follow', checkIfAuthenticated, (req
 });
 
 // Delete Follow of User
-router.post('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, (req, res) => {
+router.post("/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
+            await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
                 .delete();
             if (!req.body["isBookSeller"]) {
-                await db.collection('users').doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
+                await db.collection("users").doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
                 .delete();
             }
             console.log(req.body["nbFollowers"]);
             console.log(req.body["nbFollowing"]);
-            await db.collection(req.body["isBookSeller"] ? 'bookseller' : 'users').doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
-            await db.collection('users').doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
+            await db.collection(req.body["isBookSeller"] ? "bookseller" : "users").doc(req.params.user_id_to_unfollow).set({ "nbFollowers": parseInt(req.body["nbFollowers"]) }, { merge: true });
+            await db.collection("users").doc(req.headers.uid).set({ "nbFollowing": parseInt(req.body["nbFollowing"]) }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
@@ -156,10 +156,10 @@ router.post('/api/bdd/unFollowUser/:user_id_to_unfollow', checkIfAuthenticated, 
 });
 
 // Check if user is Follow
-router.get('/api/bdd/isFollow/:user_id', checkIfAuthenticated, (req, res) => {
+router.get("/isFollow/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            const doc = await db.collection('users').doc(req.headers.uid).collection("following").doc(req.params.user_id)
+            const doc = await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id)
                 .get();
             return res.status(200).send({
                 "status": doc.data() != undefined
@@ -172,11 +172,11 @@ router.get('/api/bdd/isFollow/:user_id', checkIfAuthenticated, (req, res) => {
 });
 
 // get list followers by user ID
-router.get('/api/bdd/getListFollowers/:user_id', checkIfAuthenticated, (req, res) => {
+router.get("/getListFollowers/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let followers = [];
-            let snap = await db.collection('users').doc(req.params.user_id).collection("followers").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("users").doc(req.params.user_id).collection("followers").orderBy("timestamp", "desc").limit(5).get();
             let docs = snap.docs;
             for (let doc of docs) {
                 followers.push(doc.data());
@@ -190,11 +190,11 @@ router.get('/api/bdd/getListFollowers/:user_id', checkIfAuthenticated, (req, res
 });
 
 // get list following by user ID
-router.get('/api/bdd/getListFollowing/:user_id', checkIfAuthenticated, (req, res) => {
+router.get("/getListFollowing/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let following = [];
-            let snap = await db.collection('users').doc(req.params.user_id).collection("following").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("users").doc(req.params.user_id).collection("following").orderBy("timestamp", "desc").limit(5).get();
             let docs = snap.docs;
             for (let doc of docs) {
                 following.push(doc.data());

@@ -1,16 +1,16 @@
-const express = require('express');
-const middleware = require('../src/middleware.js');
-const admin = require('firebase-admin');
+const express = require("express");
+const middleware = require("../src/middleware.js");
+const admin = require("firebase-admin");
 const router = express.Router();
 
 const db = admin.firestore();
 const checkIfAuthenticated = middleware.checkIfAuthenticated;
 
 // get user by id
-router.get('/api/bdd/getBookSellerById/:bookseller_id', checkIfAuthenticated, (req, res) => {
+router.get("/getBookSellerById/:bookseller_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
-            doc = await db.collection('bookseller').doc(req.params.bookseller_id).get();
+            doc = await db.collection("bookseller").doc(req.params.bookseller_id).get();
             return res.status(200).send(doc.data());
         } catch (error) {
             console.log(error);
@@ -20,11 +20,11 @@ router.get('/api/bdd/getBookSellerById/:bookseller_id', checkIfAuthenticated, (r
 });
 
 // get init list booksellers
-router.get('/api/bdd/getInitListBookSeller', checkIfAuthenticated, (req, res) => {
+router.get("/getInitListBookSeller", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let booksSellers = [];
-            let snap = await db.collection('bookseller').orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("bookseller").orderBy("timestamp", "desc").limit(5).get();
             let docs = snap.docs;
             for (let doc of docs) {
                 booksSellers.push(doc.data());
@@ -39,11 +39,11 @@ router.get('/api/bdd/getInitListBookSeller', checkIfAuthenticated, (req, res) =>
 
 
 // get list books week by bookSeller ID
-router.get('/api/bdd/getListBooksWeek/:bookseller_id', checkIfAuthenticated, (req, res) => {
+router.get("/getListBooksWeek/:bookseller_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let booksWeek = [];
-            let snap = await db.collection('bookweek').doc(req.params.bookseller_id).collection("books").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("bookweek").doc(req.params.bookseller_id).collection("books").orderBy("timestamp", "desc").limit(5).get();
             let docs = snap.docs;
             for (let doc of docs) {
                 booksWeek.push(doc.data());
@@ -57,12 +57,12 @@ router.get('/api/bdd/getListBooksWeek/:bookseller_id', checkIfAuthenticated, (re
 });
 
 // Add Book to Gallery of User
-router.post('/api/bdd/addBookWeek', checkIfAuthenticated, (req, res) => {
+router.post("/addBookWeek", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = req.body;
             data["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
-            await db.collection('bookweek').doc(req.headers.uid).collection("books").doc(req.body["id"])
+            await db.collection("bookweek").doc(req.headers.uid).collection("books").doc(req.body["id"])
                 .set(data, { merge: true });
             return res.status(200).send();
         } catch (error) {

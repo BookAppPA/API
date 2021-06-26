@@ -1,6 +1,4 @@
-const express = require('express');
-const admin = require('firebase-admin');
-const router = express.Router();
+const admin = require("firebase-admin");
 
 //TODO: Ajout Middleware --> https://dev.to/emeka/securing-your-express-node-js-api-with-firebase-auth-4b5f
 
@@ -10,9 +8,9 @@ const adminAuth = admin.auth();
 const getAuthToken = (req, res, next) => {
     if (
         req.headers.authorization &&
-        req.headers.authorization.split(' ')[0] === 'Bearer'
+        req.headers.authorization.split(" ")[0] === "Bearer"
     ) {
-        req.authToken = req.headers.authorization.split(' ')[1];
+        req.authToken = req.headers.authorization.split(" ")[1];
     } else {
         req.authToken = null;
     }
@@ -20,7 +18,7 @@ const getAuthToken = (req, res, next) => {
 };
 
 const checkIfAuthenticated = (req, res, next) => {
-    getAuthToken(req, res, async () => {
+    getAuthToken(async (req, res) => {
         try {
             const { authToken } = req;
             const userInfo = await adminAuth.verifyIdToken(authToken);
@@ -29,7 +27,7 @@ const checkIfAuthenticated = (req, res, next) => {
         } catch (e) {
             return res
                 .status(401)
-                .send({ error: 'You are not authorized to make this request' });
+                .send({ error: "You are not authorized to make this request" });
         }
     });
 };
@@ -38,7 +36,7 @@ const checkIfAuthenticated = (req, res, next) => {
 const makeUserAdmin = async (req, res) => {
     const { userId } = req.body; // userId is the firebase uid for the user
     await adminAuth.setCustomUserClaims(userId, { admin: true });
-    return res.send({ message: 'Success' })
+    return res.send({ message: "Success" })
 }
 
 const checkIfAdmin = (req, res, next) => {
@@ -52,11 +50,11 @@ const checkIfAdmin = (req, res, next) => {
                 return next();
             }
 
-            throw new Error('unauthorized')
+            throw new Error("unauthorized")
         } catch (e) {
             return res
                 .status(401)
-                .send({ error: 'You are not authorized to make this request' });
+                .send({ error: "You are not authorized to make this request" });
         }
     });
 };
