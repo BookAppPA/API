@@ -26,7 +26,7 @@ const checkIfAuthenticated = (req, res, next) => {
             return next();
         } catch (e) {
             return res
-                .status(401)
+                .status(403)
                 .send({ error: "You are not authorized to make this request" });
         }
     });
@@ -53,7 +53,7 @@ const checkIfAdmin = (req, res, next) => {
             throw new Error("unauthorized")
         } catch (e) {
             return res
-                .status(401)
+                .status(403)
                 .send({ error: "You are not authorized to make this request" });
         }
     });

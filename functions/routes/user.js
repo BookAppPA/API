@@ -34,7 +34,7 @@ router.put("/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get user by id
-router.get("/getUserById/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/getUserById/:user_id", (req, res) => {
     (async () => {
         try {
             var doc = await db.collection("users").doc(req.params.user_id).get();

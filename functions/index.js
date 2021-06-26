@@ -30,26 +30,70 @@ const config = {
 
 firebase.initializeApp(config);
 
+const validateFirebaseIdToken = async (req, res, next) => {
+  functions.logger.log('Check if request is authorized with Firebase ID token');
+
+  if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
+      !(req.cookies && req.cookies.__session)) {
+    functions.logger.error(
+      'No Firebase ID token was passed as a Bearer token in the Authorization header.',
+      'Make sure you authorize your request by providing the following HTTP header:',
+      'Authorization: Bearer <Firebase ID Token>',
+      'or by passing a "__session" cookie.'
+    );
+    res.status(403).send('Unauthorized');
+    return;
+  }
+
+  let idToken;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    functions.logger.log('Found "Authorization" header');
+    // Read the ID Token from the Authorization header.
+    idToken = req.headers.authorization.split('Bearer ')[1];
+  } else if(req.cookies) {
+    functions.logger.log('Found "__session" cookie');
+    // Read the ID Token from cookie.
+    idToken = req.cookies.__session;
+  } else {
+    // No cookie
+    res.status(403).send('Unauthorized');
+    return;
+  }
+
+  try {
+    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+    functions.logger.log('ID Token correctly decoded', decodedIdToken);
+    req.user = decodedIdToken;
+    next();
+    return;
+  } catch (error) {
+    functions.logger.error('Error while verifying Firebase ID token:', error);
+    res.status(403).send('Unauthorized');
+    return;
+  }
+};
+
 const app = express();
 app.use(cors({ origin: true }));
 
-const authR = require("./routes/auth.js");
-const auth = app.use(authR);
+app.use(validateFirebaseIdToken);
 
-const userR = require("./routes/user.js");
-const user = app.use(userR); 
+/*const middleware = require("./src/middleware.js");
+app.use(middleware.checkIfAuthenticated);
 
-const bookR = require("./routes/book.js");
-const book = app.use(bookR); 
+app.use(middleware.checkIfAdmin);*/
 
-const searchR = require("./routes/search.js");
-const search = app.use(searchR); 
+app.use(require("./routes/user.js"));
 
-const ratingR = require("./routes/rating.js");
-const rating = app.use(ratingR); 
+app.use(require("./routes/auth.js"));
 
-const booksellerR = require("./routes/bookseller.js");
-const bookseller = app.use(booksellerR); 
+app.use(require("./routes/book.js")); 
+
+app.use(require("./routes/search.js")); 
+
+app.use(require("./routes/rating.js")); 
+
+app.use(require("./routes/bookseller.js")); 
 
 // Get Date Server
 exports.dateServer = functions.region("europe-west3").https.onRequest((request, res) => {
@@ -57,9 +101,4 @@ exports.dateServer = functions.region("europe-west3").https.onRequest((request, 
   res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
 });
 
-exports.auth = functions.region("europe-west3").https.onRequest(auth);
-exports.book = functions.region("europe-west3").https.onRequest(book);
-exports.user = functions.region("europe-west3").https.onRequest(user);
-exports.search = functions.region("europe-west3").https.onRequest(search);
-exports.rating = functions.region("europe-west3").https.onRequest(rating);
-exports.bookseller = functions.region("europe-west3").https.onRequest(bookseller);
+exports.app = functions.region("europe-west3").https.onRequest(app);
