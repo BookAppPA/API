@@ -42,11 +42,9 @@ router.get("/rating/userListRatings", checkIfAuthenticated, (req, res) => {
             let ratings = [];
             let booksId = req.headers.listbooks.split("/");
             for (let id of booksId) {
-                let query = db.collection("ratings").doc(id).collection("comments").doc(req.headers.uid);
-                let res = await query.get();
-                if (res.docs.length == 1) {
-                    let map = res.docs[0].data();
-                    ratings.push(map);
+                let snap = await db.collection("ratings").doc(id).collection("comments").doc(req.headers.uid).get();
+                if (snap.data() != undefined) {
+                    ratings.push(snap.data());
                 }
             }
             return res.status(200).send(ratings);
