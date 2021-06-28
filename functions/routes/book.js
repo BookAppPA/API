@@ -7,11 +7,11 @@ const constant = require("../src/constant.js");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.checkIfAuthenticated;
+const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 // get popular books
-router.get("/popularBooks", (req, res) => {
+router.get("/book/popularBooks", (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlGoogleBooksAPI}volumes?q=harry+potter&filter=partial&maxResults=6`;
@@ -32,7 +32,7 @@ router.get("/popularBooks", (req, res) => {
 });
 
 // get books by id
-router.get("/bookDetail/:book_id", checkIfAuthenticated, (req, res) => {
+router.get("/book/bookDetail/:book_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlGoogleBooksAPI}volumes/${req.params.book_id}`;
@@ -52,7 +52,7 @@ router.get("/bookDetail/:book_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get list user books
-router.get("/userListBooks/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/book/userListBooks/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlGoogleBooksAPI}volumes/`;

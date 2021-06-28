@@ -4,10 +4,10 @@ const admin = require("firebase-admin");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.checkIfAuthenticated;
+const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 
 // get list ratings by book ID
-router.get("/ratingByBook/:book_id", checkIfAuthenticated, (req, res) => {
+router.get("/rating/ratingByBook/:book_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let map = {};
@@ -36,7 +36,7 @@ router.get("/ratingByBook/:book_id", checkIfAuthenticated, (req, res) => {
 
 
 // get list last user ratings
-router.get("/userListRatings", checkIfAuthenticated, (req, res) => {
+router.get("/rating/userListRatings", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let ratings = [];
@@ -58,7 +58,7 @@ router.get("/userListRatings", checkIfAuthenticated, (req, res) => {
 });
 
 // Add Rating by userID
-router.post("/addRating/:book_id", checkIfAuthenticated, (req, res) => {
+router.post("/rating/addRating/:book_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = req.body;
@@ -92,7 +92,7 @@ router.post("/addRating/:book_id", checkIfAuthenticated, (req, res) => {
 });
 
 // Modify Rating by user
-router.put("/modifyRating/:book_id", checkIfAuthenticated, (req, res) => {
+router.put("/rating/modifyRating/:book_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await db.collection("ratings").doc(req.params.book_id).collection("comments").doc(req.headers.uid).set(req.body, {merge: true});
@@ -105,7 +105,7 @@ router.put("/modifyRating/:book_id", checkIfAuthenticated, (req, res) => {
 
 
 // Delete Rating by userID
-router.delete("/deleteRating/:book_id", checkIfAuthenticated, (req, res) => {
+router.delete("/rating/deleteRating/:book_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = req.body;

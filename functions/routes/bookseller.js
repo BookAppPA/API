@@ -4,10 +4,10 @@ const admin = require("firebase-admin");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.checkIfAuthenticated;
+const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 
 // get user by id
-router.get("/getBookSellerById/:bookseller_id", checkIfAuthenticated, (req, res) => {
+router.get("/bookseller/getBookSellerById/:bookseller_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             doc = await db.collection("bookseller").doc(req.params.bookseller_id).get();
@@ -20,7 +20,7 @@ router.get("/getBookSellerById/:bookseller_id", checkIfAuthenticated, (req, res)
 });
 
 // get init list booksellers
-router.get("/getInitListBookSeller", checkIfAuthenticated, (req, res) => {
+router.get("/bookseller/getInitListBookSeller", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let booksSellers = [];
@@ -39,7 +39,7 @@ router.get("/getInitListBookSeller", checkIfAuthenticated, (req, res) => {
 
 
 // get list books week by bookSeller ID
-router.get("/getListBooksWeek/:bookseller_id", checkIfAuthenticated, (req, res) => {
+router.get("/bookseller/getListBooksWeek/:bookseller_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let booksWeek = [];
@@ -57,7 +57,7 @@ router.get("/getListBooksWeek/:bookseller_id", checkIfAuthenticated, (req, res) 
 });
 
 // Add Book to Gallery of User
-router.post("/addBookWeek", checkIfAuthenticated, (req, res) => {
+router.post("/bookseller/addBookWeek", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = req.body;

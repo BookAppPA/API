@@ -4,10 +4,10 @@ const admin = require("firebase-admin");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.checkIfAuthenticated;
+const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 
 // Update user
-router.put("/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
+router.put("/user/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const isBookSeller = req.headers.isbookseller == "true";
@@ -34,8 +34,8 @@ router.put("/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get user by id
-router.get("/getUserById/:user_id", (req, res) => {
-    checkIfAuthenticated(req, res, (async () => {
+router.get("/user/getUserById/:user_id", checkIfAuthenticated, (req, res) => {
+    (async () => {
         try {
             var doc = await db.collection("users").doc(req.params.user_id).get();
             var map = {
@@ -53,11 +53,11 @@ router.get("/getUserById/:user_id", (req, res) => {
             console.log(error);
             return res.status(500).send(error);
         }
-    })());
+    })();
 });
 
 //get all users in app
-router.get("/getAllUsers", checkIfAuthenticated, (req, res) => {
+router.get("/user/getAllUsers", (req, res) => {
     (async () => {
         try {
             const users = [];
@@ -75,7 +75,7 @@ router.get("/getAllUsers", checkIfAuthenticated, (req, res) => {
 });
 
 // Add Book to Gallery of User
-router.post("/addBookToGallery", checkIfAuthenticated, (req, res) => {
+router.post("/user/addBookToGallery", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let data = {
@@ -95,7 +95,7 @@ router.post("/addBookToGallery", checkIfAuthenticated, (req, res) => {
 
 
 // Delete Book From Gallery of User
-router.post("/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
+router.post("/user/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await db.collection("books_users").doc(`${req.headers.uid}-${req.body["bookid"]}`)
@@ -109,7 +109,7 @@ router.post("/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
 });
 
 // Follow User
-router.post("/followUser/:user_id_to_follow", checkIfAuthenticated, (req, res) => {
+router.post("/user/followUser/:user_id_to_follow", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const userDest = JSON.parse(req.body["userDest"]);
@@ -134,7 +134,7 @@ router.post("/followUser/:user_id_to_follow", checkIfAuthenticated, (req, res) =
 });
 
 // Delete Follow of User
-router.post("/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (req, res) => {
+router.post("/user/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
@@ -156,7 +156,7 @@ router.post("/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (req, re
 });
 
 // Check if user is Follow
-router.get("/isFollow/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/isFollow/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const doc = await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id)
@@ -172,7 +172,7 @@ router.get("/isFollow/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get list followers by user ID
-router.get("/getListFollowers/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/getListFollowers/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let followers = [];
@@ -190,7 +190,7 @@ router.get("/getListFollowers/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get list following by user ID
-router.get("/getListFollowing/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/getListFollowing/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let following = [];

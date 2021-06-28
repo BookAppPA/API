@@ -13,7 +13,7 @@ const baseUrlCheckSiret = constant.baseUrlCheckSiret;
 const baseUrlCheckSiren = constant.baseUrlCheckSiren;
 
 // Signup user
-router.post("/signup", async (req, res) => {
+router.post("/auth/signup", async (req, res) => {
         try {
             const user = await adminAuth.createUser({
                 email: req.body.email,
@@ -35,7 +35,7 @@ router.post("/signup", async (req, res) => {
 });
 
 // Login user
-router.post("/login", (req, res) => {
+router.post("/auth/login", (req, res) => {
     (async () => {
         try {
             const userCredential = await firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password);
@@ -61,7 +61,7 @@ router.post("/login", (req, res) => {
 });
 
 // Logout user
-router.post("/logout", checkIfAuthenticated, (req, res) => {
+router.post("/auth/logout", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             await firebase.auth().signOut();
@@ -74,7 +74,7 @@ router.post("/logout", checkIfAuthenticated, (req, res) => {
 });
 
 // Check SIRET number is valid and return infos
-router.get("/checkSiret", (req, res) => {
+router.get("/auth/checkSiret", (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlCheckSiret}${req.headers.siret}`;
@@ -95,7 +95,7 @@ router.get("/checkSiret", (req, res) => {
 });
 
 // Check SIREN number is valid and return infos
-router.get("/checkSiren", (req, res) => {
+router.get("/auth/checkSiren", (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlCheckSiren}${req.headers.siren}`;
@@ -116,7 +116,7 @@ router.get("/checkSiren", (req, res) => {
 });
 
 // Signup bookseller
-router.post("/signupBookSeller", (req, res) => {
+router.post("/auth/signupBookSeller", (req, res) => {
     (async () => {
         try {
             const snap = await db.collection("bookseller").where("siret" , "==", req.body.siret).limit(1).get();
