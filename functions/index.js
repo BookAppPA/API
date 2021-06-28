@@ -76,7 +76,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
 const app = express();
 app.use(cors({ origin: true }));
 
-app.use(validateFirebaseIdToken);
+//app.use(validateFirebaseIdToken);
 
 /*const middleware = require("./src/middleware.js");
 app.use(middleware.checkIfAuthenticated);

@@ -35,7 +35,7 @@ router.put("/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
 
 // get user by id
 router.get("/getUserById/:user_id", (req, res) => {
-    (async () => {
+    checkIfAuthenticated(req, res, (async () => {
         try {
             var doc = await db.collection("users").doc(req.params.user_id).get();
             var map = {
@@ -53,7 +53,7 @@ router.get("/getUserById/:user_id", (req, res) => {
             console.log(error);
             return res.status(500).send(error);
         }
-    })();
+    })());
 });
 
 //get all users in app
@@ -141,7 +141,7 @@ router.post("/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (req, re
                 .delete();
             if (!req.body["isBookSeller"]) {
                 await db.collection("users").doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
-                .delete();
+                    .delete();
             }
             console.log(req.body["nbFollowers"]);
             console.log(req.body["nbFollowing"]);
