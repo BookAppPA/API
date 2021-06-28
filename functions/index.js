@@ -101,4 +101,6 @@ exports.dateServer = functions.region("europe-west3").https.onRequest((request, 
   res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
 });
 
+const biQuery = require('./biqQuery/get_data_from_analytics');
+
 exports.app = functions.region("europe-west3").https.onRequest(app);
