@@ -85,6 +85,11 @@ router.post("/user/addBookToGallery", checkIfAuthenticated, (req, res) => {
             };
             await db.collection("books_users").doc(`${req.headers.uid}-${req.body["bookid"]}`)
                 .set(data, { merge: true });
+            var nbBooks = parseInt(req.body["nbBook"]) + 1;
+            if (nbBooks < 0) {
+                nbBooks = 0;
+            }
+            await db.collection("users").doc(req.headers.uid).set({"nbBooks": nbBooks}, {merge: true});
             return res.status(200).send();
         } catch (error) {
             console.log(error);
@@ -100,6 +105,11 @@ router.post("/user/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
         try {
             await db.collection("books_users").doc(`${req.headers.uid}-${req.body["bookid"]}`)
                 .delete();
+            var nbBooks = parseInt(req.body["nbBook"]) - 1;
+            if (nbBooks < 0) {
+                nbBooks = 0;
+            }
+            await db.collection("users").doc(req.headers.uid).set({"nbBooks": nbBooks}, {merge: true});
             return res.status(200).send();
         } catch (error) {
             console.log(error);
