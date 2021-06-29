@@ -14,7 +14,7 @@ const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 router.get("/book/popularBooks", (req, res) => {
     (async () => {
         try {
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=harry+potter&filter=partial&maxResults=6`;
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=harry+potter&filter=partial&maxResults=6&langRestrict=fr`;
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log("error:", error);
