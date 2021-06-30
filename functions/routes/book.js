@@ -14,15 +14,29 @@ const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 router.get("/book/popularBooks", (req, res) => {
     (async () => {
         try {
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=harry+potter&filter=partial&maxResults=6&langRestrict=fr`;
-            requestExternalAPI(url, function (error, response, body) {
-                if (error) {
-                    console.log("error:", error);
-                    return res.status(500).send(error);
-                } else {
-                    let books = JSON.parse(body);
-                    return res.status(200).send(books.items);
+            var listID = [];
+            var snap = await db.collection("ratings").orderBy("note", "desc").limit(6).get();
+            let docs = snap.docs;
+            for (let doc of docs) {
+                listID.push(doc.data()["id"]);
+            }
+            if (listID.length == 0) {
+                return res.status(200).send(listID);
+            }
+            let base = `${baseUrlGoogleBooksAPI}volumes/`;
+            let urls = [];
+            for (let i = 0; i < listID.length; i++) {
+                urls.push(base + listID[i]);
+            }
+            asyncjs.map(urls, function (url, callback) {
+                requestExternalAPI(url, function (err, response, body) {
+                    callback(err, JSON.parse(body));
+                })
+            }, function (err, books) {
+                if (err) {
+                    return res.status(500).send(err);
                 }
+                return res.status(200).send(books);
             });
         } catch (error) {
             console.log(error);
