@@ -72,5 +72,23 @@ router.post("/bookseller/addBookWeek", checkIfAuthenticated, (req, res) => {
     })();
 });
 
+// get last books weeks
+router.get("/bookseller/getLastBooksWeek", checkIfAuthenticated, (req, res) => {
+    (async () => {
+        try {
+            let booksWeek = [];
+            let snap = await db.collection("bookweek").orderBy("timestamp", "desc").limit(6).get();
+            let docs = snap.docs;
+            for (let doc of docs) {
+                booksWeek.push(doc.data());
+            }
+            return res.status(200).send(booksWeek);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    })();
+});
+
 
 module.exports = router
