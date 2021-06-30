@@ -11,8 +11,8 @@ router.put("/user/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const isBookSeller = req.headers.isbookseller == "true";
+            const data = req.body;
             if (isBookSeller) {
-                const data = req.body;
                 if (data["open_hour"] != undefined) {
                     data["open_hour"] = JSON.parse(data["open_hour"]);
                 }
@@ -22,8 +22,12 @@ router.put("/user/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
                 await db.collection("bookseller").doc(req.params.user_id)
                     .set(data, { merge: true });
             } else {
+                if (data["listCategories"] != undefined) {
+                    data["listCategories"] = JSON.parse(data["listCategories"].replace(/'/g, '"'));
+                }
+                console.log(data);
                 await db.collection("users").doc(req.params.user_id)
-                    .set(req.body, { merge: true });
+                    .set(data, { merge: true });
             }
             return res.status(200).send();
         } catch (error) {
@@ -89,7 +93,7 @@ router.post("/user/addBookToGallery", checkIfAuthenticated, (req, res) => {
             if (nbBooks < 0) {
                 nbBooks = 0;
             }
-            await db.collection("users").doc(req.headers.uid).set({"nbBooks": nbBooks}, {merge: true});
+            await db.collection("users").doc(req.headers.uid).set({ "nbBooks": nbBooks }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
@@ -109,7 +113,7 @@ router.post("/user/deleteBookFromGallery", checkIfAuthenticated, (req, res) => {
             if (nbBooks < 0) {
                 nbBooks = 0;
             }
-            await db.collection("users").doc(req.headers.uid).set({"nbBooks": nbBooks}, {merge: true});
+            await db.collection("users").doc(req.headers.uid).set({ "nbBooks": nbBooks }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
