@@ -12,7 +12,7 @@ async function getDataFromAnalytics() {
   // la query pour filtrer les resultats analytics.
   const sqlQuery = `SELECT 
     * 
-      FROM \`book-app-7f51e.analytics_269759773.events_20210626\` 
+      FROM \`book-app-7f51e.analytics_269759773.events_20210630\` 
         WHERE event_name like '%view_item%'
   `;
 
@@ -42,10 +42,11 @@ async function getDataFromAnalytics() {
       if (params.key === 'item_location_id') {
         data["user_id"] = params.value.string_value;
       }
-
-      //changer l'event dans l'app pour match la category avec category et l'author avec author.
-      if (params.key === 'item_category') {
+      if (params.key === 'origin') {
         data["book_author"] = params.value.string_value;
+      }
+      if (params.key === 'item_category') {
+        data["category"] = params.value.string_value;
       }
     })
   });
