@@ -30,7 +30,6 @@ const config = {
 
 firebase.initializeApp(config);
 
-
 const app = express();
 app.use(cors({ origin: true }));
 
@@ -38,13 +37,15 @@ app.use(require("./routes/user.js"));
 
 app.use(require("./routes/auth.js"));
 
-app.use(require("./routes/book.js")); 
+app.use(require("./routes/book.js"));
 
-app.use(require("./routes/search.js")); 
+app.use(require("./routes/search.js"));
 
-app.use(require("./routes/rating.js")); 
+app.use(require("./routes/rating.js"));
 
-app.use(require("./routes/bookseller.js")); 
+app.use(require("./routes/feed.js"));
+
+app.use(require("./routes/bookseller.js"));
 
 // Get Date Server
 exports.dateServer = functions.region("europe-west3").https.onRequest((request, res) => {
@@ -55,3 +56,19 @@ exports.dateServer = functions.region("europe-west3").https.onRequest((request, 
 const biQuery = require('./biqQuery/get_data_from_analytics');
 
 exports.app = functions.region("europe-west3").https.onRequest(app);
+
+
+// Populate Feed
+exports.populateFeed = functions.region('europe-west3').firestore
+  .document('/ratings/{bookId}/comments/{userId}')
+  .onCreate(async (snapshot, context) => {
+    const rating = snapshot.data()
+    //const nameSender = doc.name.toString();
+    const meId = context.params.userId.toString();
+
+    const followersSnap = await db.collection("users").doc(meId).collection('followers').get();
+    let followersDocs = followersSnap.docs;
+    for (let follower of followersDocs) {
+      await db.collection("users").doc(follower.data()["id"]).collection("feed").add(rating);
+    }
+  });
