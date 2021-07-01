@@ -33,6 +33,8 @@ firebase.initializeApp(config);
 const app = express();
 app.use(cors({ origin: true }));
 
+const db = admin.firestore();
+
 app.use(require("./routes/user.js"));
 
 app.use(require("./routes/auth.js"));

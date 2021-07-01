@@ -67,8 +67,8 @@ router.post("/rating/addRating/:book_id", checkIfAuthenticated, (req, res) => {
             data["rating"]["note"] = parseFloat(data["rating"]["note"]);
             await db.collection("ratings").doc(req.params.book_id).collection("comments").doc(req.headers.uid).set(data["rating"]);
             const doc = await db.collection("ratings").doc(req.params.book_id).get();
-            const nbRatings = 0;
-            const noteGlobal = 0;
+            var nbRatings = 0;
+            var noteGlobal = 0;
             if (doc.data() == undefined) {
                 await db.collection("ratings").doc(req.params.book_id).set({
                     "book_pic": data["rating"]["book_pic"],
