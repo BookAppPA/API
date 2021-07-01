@@ -71,7 +71,7 @@ async function extractTableToGCS() {
   const datasetId = 'ml_alldata_app';
   const tableId = 'all_data';
   const bucketName = "gs://book-app-7f51e.appspot.com/ml_data";
-  const filename = "test_export_csv";
+  const filename = "test_export.csv";
 
   const options = {
     location: 'EU',
