@@ -12,6 +12,8 @@ const cors = require("cors");
 //   response.send("Hello from Firebase!");
 // });
 
+const APP_NAME = "BookWorm";
+
 var serviceAccount = require("./permission.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -65,12 +67,31 @@ exports.populateFeed = functions.region('europe-west3').firestore
   .document('/ratings/{bookId}/comments/{userId}')
   .onCreate(async (snapshot, context) => {
     const rating = snapshot.data()
-    //const nameSender = doc.name.toString();
+    const nameSender = rating.username.toString();
     const meId = context.params.userId.toString();
 
     const followersSnap = await db.collection("users").doc(meId).collection('followers').get();
     let followersDocs = followersSnap.docs;
+    const payload = {
+      notification: {
+        title: `${APP_NAME}`,
+        body: `${nameSender} vient de publier un avis !`,
+        sound: 'default',
+        badge: '1',
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+      },
+      data: {
+        status: "rating",
+        senderId: meId,
+      }
+    }
+    // During 24H
+    const options = {
+      priority: "high",
+      timeToLive: 60 * 60 * 24,
+    }
     for (let follower of followersDocs) {
       await db.collection("users").doc(follower.data()["id"]).collection("feed").add(rating);
     }
+    return fcm.sendToTopic('rating/' + meId, payload);
   });
