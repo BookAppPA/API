@@ -3,6 +3,9 @@ const admin = require("firebase-admin");
 const firebase = require("firebase");
 const express = require("express");
 const cors = require("cors");
+const big_query = require('./biqQuery/get_data_from_analytics');
+const getDataFromAnalytics = big_query.getDataFromAnalytics;
+const extractTableToGCS = big_query.extractTableToGCS;
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -51,15 +54,21 @@ app.use(require("./routes/feed.js"));
 
 app.use(require("./routes/bookseller.js"));
 
+app.use(require('./ml/train_model.js'));
+
 // Get Date Server
 exports.dateServer = functions.region("europe-west3").https.onRequest((request, res) => {
   res.setHeader("Content-Type", "application/json");
   res.status(200).send(JSON.stringify({ timestamp: Date.now() }));
 });
 
-const biQuery = require('./biqQuery/get_data_from_analytics');
-
 exports.app = functions.region("europe-west3").https.onRequest(app);
+
+// exports.bigQueryPubSub = functions.region("europe-west3").pubsub.schedule('every 5 minutes').onRun((context) => {
+//   // getDataFromAnalytics;
+//   // extractTableToGCS;
+//   functions.logger.error('TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
+// });
 
 
 // Populate Feed

@@ -14,7 +14,29 @@ router.get("/search/searchBook", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=${search}&filter=partial&langRestrict=fr&maxResults=2`;
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=${search}&filter=partial&langRestrict=fr&maxResults=10`;
+            requestExternalAPI(url, function (error, response, body) {
+                if (error) {
+                    console.log("error:", error);
+                    return res.status(500).send(error);
+                } else {
+                    let books = JSON.parse(body);
+                    return res.status(200).send(books.items);
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    })();
+});
+
+// search books by categories from
+router.get("/search/searchBooksByCategories", checkIfAuthenticated, (req, res) => {
+    (async () => {
+        try {
+            let search = req.headers.search.replace(" ", "+");
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=subject:${search}&filter=partial&langRestrict=fr&maxResults=10`;
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log("error:", error);
@@ -36,7 +58,7 @@ router.get("/search/searchBooksByAuthor", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=inauthor:${search}&filter=partial&langRestrict=fr&maxResults=2`;
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=inauthor:${search}&filter=partial&langRestrict=fr&maxResults=1O`;
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log("error:", error);
