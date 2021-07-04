@@ -14,11 +14,11 @@ const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 const storage = new Storage();
 const bucketName = "gs://book-app-7f51e.appspot.com";
-const fileModelJSON = "/model/model.json"
-const fileDataset = "/data/web_book_data.json";
-const fileBin = "/model/group1-shard1of1.bin"
+const fileModelJSON = "/model.json"
+const fileDataset = "/web_book_data.json";
+const fileBin = "/group1-shard1of1.bin"
 
-var books = os.tmpdir() + '/data/web_book_data.json';
+var books;
 
 var model;
 
@@ -33,24 +33,22 @@ async function downloadFile() {
         destination: os.tmpdir() + fileBin,
     }
     await storage.bucket(bucketName).file('ml_data/model_js/model.json').download(optionsModel)
-    functions.logger.log("storage download");
     await storage.bucket(bucketName).file("ml_data/model_js/web_book_data.json").download(optionDataset)
     await storage.bucket(bucketName).file("ml_data/model_js/group1-shard1of1.bin").download(optionBin)
+    console.log('end download --- osDir', os.tmpdir());
+    books = require(os.tmpdir() + fileDataset);
 }
 
 
 async function loadModel() {
-    // await downloadFile();
+    await downloadFile();
     // home_ = process.cwd()
-    // functions.logger.log(home_);
-    modelpath = "file://" + os.tmpdir() + "/model/model.json"
+    model_path = "file://"+ os.tmpdir() + "/model.json"
+    console.log('FILENAME', model_path);
     // functions.logger.log(modelpath);
-    model = await tf.loadLayersModel(modelpath, false);
-    // model.summary()
+    model = await tf.loadLayersModel(model_path, false);
+    model.summary()
 }
-
-const book_arr = tf.range(0, books.length)
-const book_len = books.length
 
 function shuffle(array) {
     var currentIndex = array.length, randomIndex;
@@ -64,9 +62,10 @@ function shuffle(array) {
 }
 
 async function recommend(userId) {
-    let user = tf.fill([book_len], Number(userId))
-    let book_in_js_array = book_arr.arraySync()
     await loadModel()
+    const book_arr = tf.range(0, books.length)
+    const book_len = books.length
+    let user = tf.fill([book_len], Number(userId))
     pred_tensor = await model.predict([book_arr, user]).reshape([10000])
     pred = pred_tensor.arraySync()
 
