@@ -27,7 +27,7 @@ router.post("/auth/signup", async (req, res) => {
                 isBlocked: false,
             };
             const snap = await db.collection("statistic").doc("stats").get();
-            const mlID = snap.data()["user_id_count"] + 1;
+            const mlID = snap.data()["ml_id"] + 1;
             map["ml_id"] = mlID;
             await db.collection("users").doc(user.uid).set(map, { merge: true });
             await db.collection("statistic").doc("stats").set({"ml_id": mlID }, {merge: true});
