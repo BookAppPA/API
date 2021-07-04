@@ -153,7 +153,7 @@ router.post("/user/unFollowUser/:user_id_to_unfollow", checkIfAuthenticated, (re
         try {
             await db.collection("users").doc(req.headers.uid).collection("following").doc(req.params.user_id_to_unfollow)
                 .delete();
-            if (!req.body["isBookSeller"]) {
+            if (req.body["isBookSeller"] == "false") {
                 await db.collection("users").doc(req.params.user_id_to_unfollow).collection("followers").doc(req.headers.uid)
                     .delete();
             }
