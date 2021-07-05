@@ -38,7 +38,7 @@ router.put("/user/updateUser/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get user by id
-router.get("/user/getUserById/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/getUserById/:user_id", (req, res) => {
     (async () => {
         try {
             var doc = await db.collection("users").doc(req.params.user_id).get();
@@ -186,7 +186,7 @@ router.get("/user/isFollow/:user_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get list followers by user ID
-router.get("/user/getListFollowers/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/getListFollowers/:user_id", (req, res) => {
     (async () => {
         try {
             let followers = [];
@@ -204,7 +204,7 @@ router.get("/user/getListFollowers/:user_id", checkIfAuthenticated, (req, res) =
 });
 
 // get list following by user ID
-router.get("/user/getListFollowing/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/user/getListFollowing/:user_id", (req, res) => {
     (async () => {
         try {
             let following = [];

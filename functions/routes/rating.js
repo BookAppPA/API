@@ -8,7 +8,7 @@ const db = admin.firestore();
 const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 
 // get list ratings by book ID
-router.get("/rating/ratingByBook/:book_id", checkIfAuthenticated, (req, res) => {
+router.get("/rating/ratingByBook/:book_id", (req, res) => {
     (async () => {
         try {
             let map = {};
@@ -37,7 +37,7 @@ router.get("/rating/ratingByBook/:book_id", checkIfAuthenticated, (req, res) => 
 
 
 // get list last user ratings
-router.get("/rating/userListRatings", checkIfAuthenticated, (req, res) => {
+router.get("/rating/userListRatings", (req, res) => {
     (async () => {
         try {
             let ratings = [];

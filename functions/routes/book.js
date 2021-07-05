@@ -46,7 +46,7 @@ router.get("/book/popularBooks", (req, res) => {
 });
 
 // get books by id
-router.get("/book/bookDetail/:book_id", checkIfAuthenticated, (req, res) => {
+router.get("/book/bookDetail/:book_id", (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlGoogleBooksAPI}volumes/${req.params.book_id}`;
@@ -66,7 +66,7 @@ router.get("/book/bookDetail/:book_id", checkIfAuthenticated, (req, res) => {
 });
 
 // get list user books
-router.get("/book/userListBooks/:user_id", checkIfAuthenticated, (req, res) => {
+router.get("/book/userListBooks/:user_id", (req, res) => {
     (async () => {
         try {
             let url = `${baseUrlGoogleBooksAPI}volumes/`;

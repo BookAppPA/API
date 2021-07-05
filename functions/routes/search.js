@@ -1,16 +1,14 @@
 const express = require("express");
-const middleware = require("../src/middleware.js");
 const admin = require("firebase-admin");
 const constant = require("../src/constant.js");
 const requestExternalAPI = require("request");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 // get books by search
-router.get("/search/searchBook", checkIfAuthenticated, (req, res) => {
+router.get("/search/searchBook", (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
@@ -32,7 +30,7 @@ router.get("/search/searchBook", checkIfAuthenticated, (req, res) => {
 });
 
 // search books by categories from
-router.get("/search/searchBooksByCategories", checkIfAuthenticated, (req, res) => {
+router.get("/search/searchBooksByCategories", (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
@@ -54,11 +52,11 @@ router.get("/search/searchBooksByCategories", checkIfAuthenticated, (req, res) =
 });
 
 // get search books by author
-router.get("/search/searchBooksByAuthor", checkIfAuthenticated, (req, res) => {
+router.get("/search/searchBooksByAuthor", (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=inauthor:${search}&filter=partial&langRestrict=fr&maxResults=1O`;
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=inauthor:${search}&filter=partial&langRestrict=fr&maxResults=10`;
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log("error:", error);
@@ -76,7 +74,7 @@ router.get("/search/searchBooksByAuthor", checkIfAuthenticated, (req, res) => {
 });
 
 // get search users
-router.get("/search/searchUsers", checkIfAuthenticated, (req, res) => {
+router.get("/search/searchUsers", (req, res) => {
     (async () => {
         try {
             let users = [];
@@ -94,7 +92,7 @@ router.get("/search/searchUsers", checkIfAuthenticated, (req, res) => {
 });
 
 // get search bookSeller
-router.get("/search/searchBookSeller", checkIfAuthenticated, (req, res) => {
+router.get("/search/searchBookSeller", (req, res) => {
     (async () => {
         try {
             let booksellers = [];

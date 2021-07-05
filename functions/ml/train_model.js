@@ -79,7 +79,7 @@ async function recommend(userId) {
     return shuffle(recommendations)
 }
 
-router.get("/recommendation/:userId", checkIfAuthenticated, (req, res) => {
+router.get("/recommendation/:userId", (req, res) => {
     (async () => {
         try {
             let userId = req.params.userId
