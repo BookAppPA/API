@@ -1,5 +1,4 @@
 const express = require("express");
-const middleware = require("../src/middleware.js");
 const admin = require("firebase-admin");
 const asyncjs = require("async");
 const requestExternalAPI = require("request");
@@ -7,7 +6,6 @@ const constant = require("../src/constant.js");
 const router = express.Router();
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 // get popular books
@@ -97,6 +95,24 @@ router.get("/book/userListBooks/:user_id", (req, res) => {
         } catch (error) {
             console.log(error);
             return res.status(500).send(error);
+        }
+    })();
+});
+
+//get all books in app
+router.get("/book/getAllBooks", (req, res) => {
+    (async () => {
+        try {
+            const booksId = [];
+            const doc = await db.collection("books_users").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    booksId.push(doc.data().book_id);
+                })
+            })
+            return res.status(200).send(booksId);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error.toJSON());
         }
     })();
 });

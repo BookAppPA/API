@@ -34,7 +34,7 @@ router.get("/search/searchBooksByCategories", (req, res) => {
     (async () => {
         try {
             let search = req.headers.search.replace(" ", "+");
-            let url = `${baseUrlGoogleBooksAPI}volumes?q=subject:${search}&filter=partial&langRestrict=fr&maxResults=10`;
+            let url = `${baseUrlGoogleBooksAPI}volumes?q=subject:${search}&langRestrict=fr&maxResults=10`;
             requestExternalAPI(url, function (error, response, body) {
                 if (error) {
                     console.log("error:", error);

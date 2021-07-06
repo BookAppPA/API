@@ -1,14 +1,11 @@
 const express = require("express");
-const middleware = require("../src/middleware.js");
 const constant = require("../src/constant.js");
 const router = express.Router();
 const tf = require('@tensorflow/tfjs-node')
 const requestExternalAPI = require("request");
 const asyncjs = require("async");
-const functions = require("firebase-functions");
 const { Storage } = require('@google-cloud/storage');
 const os = require('os') //Firebase ne gère que un seul dossier en ecriture, le reste est en read-only;
-const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 
