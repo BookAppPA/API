@@ -64,6 +64,13 @@ router.post("/bookseller/addBookWeek", checkIfAuthenticated, (req, res) => {
             data["timestamp"] = admin.firestore.FieldValue.serverTimestamp();
             await db.collection("bookweek").doc(req.headers.uid).collection("books").doc(req.body["id"])
                 .set(data, { merge: true });
+            await db.collection("bookweek").doc(req.headers.uid).set({
+                "bio": data["bio"],
+                "book_id": data["id"],
+                "bookseller_id": req.headers.uid,
+                "picture": data["picture"],
+                "timestamp": data["timestamp"]
+            }, { merge: true });
             return res.status(200).send();
         } catch (error) {
             console.log(error);
