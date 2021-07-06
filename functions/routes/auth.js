@@ -124,7 +124,7 @@ router.get("/auth/checkSiren", (req, res) => {
 router.post("/auth/signupBookSeller", (req, res) => {
     (async () => {
         try {
-            const snap = await db.collection("bookseller").where("siret" , "==", req.body.siret).limit(1).get();
+            var snap = await db.collection("bookseller").where("siret" , "==", req.body.siret).limit(1).get();
             let docs = snap.docs;
             if (docs.length > 0) {
                 return res.status(501).send({"code": "siret/invalidate"});
@@ -147,7 +147,7 @@ router.post("/auth/signupBookSeller", (req, res) => {
                 timestamp: admin.firestore.FieldValue.serverTimestamp()
             };
             await db.collection("bookseller").doc(user.uid).set(bookseller, { merge: true });
-            const snap = await db.collection("statistic").doc("stats").get();
+            snap = await db.collection("statistic").doc("stats").get();
             const nbBookSeller = snap.data()["nb_bookseller"] + 1;
             await db.collection("statistic").doc("stats").set({"nb_bookseller": nbBookSeller }, {merge: true});
             return res.status(200).send(bookseller);
