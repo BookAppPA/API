@@ -4,6 +4,7 @@ const asyncjs = require("async");
 const requestExternalAPI = require("request");
 const constant = require("../src/constant.js");
 const router = express.Router();
+const removeTags = require('../src/functions.js');
 
 const db = admin.firestore();
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
@@ -28,7 +29,9 @@ router.get("/book/popularBooks", (req, res) => {
             }
             asyncjs.map(urls, function (url, callback) {
                 requestExternalAPI(url, function (err, response, body) {
-                    callback(err, JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    callback(err, parser);
                 })
             }, function (err, books) {
                 if (err) {
@@ -53,7 +56,9 @@ router.get("/book/bookDetail/:book_id", (req, res) => {
                     console.log("error:", error);
                     return res.status(500).send(error);
                 } else {
-                    return res.status(200).send(JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    return res.status(200).send(parser);
                 }
             });
         } catch (error) {
@@ -83,7 +88,9 @@ router.get("/book/userListBooks/:user_id", (req, res) => {
 
             asyncjs.map(urls, function (url, callback) {
                 requestExternalAPI(url, function (err, response, body) {
-                    callback(err, JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    callback(err, parser);
                 })
             }, function (err, books) {
                 if (err) {
