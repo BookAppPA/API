@@ -4,8 +4,8 @@ const firebase = require("firebase");
 const express = require("express");
 const cors = require("cors");
 const big_query = require('./biqQuery/get_data_from_analytics');
-const getDataFromAnalytics = big_query.getDataFromAnalytics;
-const extractTableToGCS = big_query.extractTableToGCS;
+// const getDataFromAnalytics = big_query.getDataFromAnalytics;
+// const extractTableToGCS = big_query.extractTableToGCS;
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions

@@ -12,7 +12,7 @@ async function getDataFromAnalytics() {
   // la query pour filtrer les resultats analytics.
   const sqlQuery = `SELECT 
     * 
-      FROM \`book-app-7f51e.analytics_269759773.events_20210701\` 
+      FROM \`book-app-7f51e.analytics_269759773.events_20210705\` 
         WHERE event_name like '%view_item%'
   `;
 
@@ -22,7 +22,7 @@ async function getDataFromAnalytics() {
 
   // Run the query
   const [rows] = await bigqueryClient.query(options);
-  const datasetId = 'ml_alldata_app';
+  const datasetId = 'all_data';
   const tableId = 'all_data';
 
   var data = {};
@@ -58,6 +58,7 @@ async function getDataFromAnalytics() {
     .table(tableId)
     .insert(res_data);
 }
+// getDataFromAnalytics()
 
 async function extractTableToGCS() {
   // Exports my_dataset:my_table to gcs://my-bucket/my-file as raw CSV.
@@ -65,7 +66,7 @@ async function extractTableToGCS() {
   /**
    * TODO(developer): Uncomment the following lines before running the sample.
    */
-  const datasetId = 'ml_alldata_app';
+  const datasetId = 'all_data';
   const tableId = 'all_data';
   const bucketName = "gs://book-app-7f51e.appspot.com/ml_data";
   const filename = "test_export.csv";
@@ -91,3 +92,4 @@ module.exports = {
   getDataFromAnalytics: getDataFromAnalytics,
   extractTableToGCS: extractTableToGCS,
 }
+// extractTableToGCS()
