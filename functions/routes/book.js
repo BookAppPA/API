@@ -1,13 +1,12 @@
 const express = require("express");
-const middleware = require("../src/middleware.js");
 const admin = require("firebase-admin");
 const asyncjs = require("async");
 const requestExternalAPI = require("request");
 const constant = require("../src/constant.js");
 const router = express.Router();
+const removeTags = require('../src/functions.js');
 
 const db = admin.firestore();
-const checkIfAuthenticated = middleware.validateFirebaseIdToken;
 const baseUrlGoogleBooksAPI = constant.baseUrlGoogleBooksAPI;
 
 // get popular books
@@ -30,7 +29,9 @@ router.get("/book/popularBooks", (req, res) => {
             }
             asyncjs.map(urls, function (url, callback) {
                 requestExternalAPI(url, function (err, response, body) {
-                    callback(err, JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    callback(err, parser);
                 })
             }, function (err, books) {
                 if (err) {
@@ -55,7 +56,9 @@ router.get("/book/bookDetail/:book_id", (req, res) => {
                     console.log("error:", error);
                     return res.status(500).send(error);
                 } else {
-                    return res.status(200).send(JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    return res.status(200).send(parser);
                 }
             });
         } catch (error) {
@@ -85,7 +88,9 @@ router.get("/book/userListBooks/:user_id", (req, res) => {
 
             asyncjs.map(urls, function (url, callback) {
                 requestExternalAPI(url, function (err, response, body) {
-                    callback(err, JSON.parse(body));
+                    var parser = JSON.parse(body);
+                    parser["volumeInfo"]["description"] = removeTags(parser["volumeInfo"]["description"])
+                    callback(err, parser);
                 })
             }, function (err, books) {
                 if (err) {
@@ -97,6 +102,24 @@ router.get("/book/userListBooks/:user_id", (req, res) => {
         } catch (error) {
             console.log(error);
             return res.status(500).send(error);
+        }
+    })();
+});
+
+//get all books in app
+router.get("/book/getAllBooks", (req, res) => {
+    (async () => {
+        try {
+            const booksId = [];
+            const doc = await db.collection("books_users").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    booksId.push(doc.data().book_id);
+                })
+            })
+            return res.status(200).send(booksId);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error.toJSON());
         }
     })();
 });

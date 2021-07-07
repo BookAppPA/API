@@ -16,6 +16,7 @@ router.get("/rating/ratingByBook/:book_id", (req, res) => {
             let doc = await db.collection("ratings").doc(req.params.book_id).get();
             let result = doc.data();
             if (result != null && result != undefined) {
+                map["id"] = result["id"]
                 map["nbRatings"] = result["nbRatings"];
                 map["note"] = result["note"];
                 map["book_title"] = result["book_title"];
