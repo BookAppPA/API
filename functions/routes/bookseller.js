@@ -24,7 +24,7 @@ router.get("/bookseller/getInitListBookSeller", (req, res) => {
     (async () => {
         try {
             let booksSellers = [];
-            let snap = await db.collection("bookseller").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("bookseller").orderBy("timestamp", "desc").get();
             let docs = snap.docs;
             for (let doc of docs) {
                 booksSellers.push(doc.data());
