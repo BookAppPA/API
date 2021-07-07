@@ -12,7 +12,7 @@ router.get("/feed/getFeed/:user_id", checkIfAuthenticated, (req, res) => {
     (async () => {
         try {
             const ratings = [];
-            const snap = await db.collection("users").doc(req.params.user_id).collection("feed").orderBy("timestamp", "desc").limit(10).get();
+            const snap = await db.collection("users").doc(req.params.user_id).collection("feed").orderBy("timestamp", "desc").get();
             let docs = snap.docs;
             for (let doc of docs) {
                 ratings.push(doc.data());

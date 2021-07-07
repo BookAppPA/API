@@ -190,7 +190,7 @@ router.get("/user/getListFollowers/:user_id", (req, res) => {
     (async () => {
         try {
             let followers = [];
-            let snap = await db.collection("users").doc(req.params.user_id).collection("followers").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("users").doc(req.params.user_id).collection("followers").orderBy("timestamp", "desc").get();
             let docs = snap.docs;
             for (let doc of docs) {
                 followers.push(doc.data());
@@ -208,7 +208,7 @@ router.get("/user/getListFollowing/:user_id", (req, res) => {
     (async () => {
         try {
             let following = [];
-            let snap = await db.collection("users").doc(req.params.user_id).collection("following").orderBy("timestamp", "desc").limit(5).get();
+            let snap = await db.collection("users").doc(req.params.user_id).collection("following").orderBy("timestamp", "desc").get();
             let docs = snap.docs;
             for (let doc of docs) {
                 following.push(doc.data());

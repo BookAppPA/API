@@ -21,7 +21,7 @@ router.get("/rating/ratingByBook/:book_id", (req, res) => {
                 map["note"] = result["note"];
                 map["book_title"] = result["book_title"];
                 map["book_pic"] = result["book_pic"];
-                let snap = await db.collection("ratings").doc(req.params.book_id).collection("comments").orderBy("timestamp", "desc").limit(5).get();
+                let snap = await db.collection("ratings").doc(req.params.book_id).collection("comments").orderBy("timestamp", "desc").get();
                 let docs = snap.docs;
                 for (let doc of docs) {
                     ratings.push(doc.data());
