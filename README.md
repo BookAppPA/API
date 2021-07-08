@@ -134,7 +134,7 @@ npm run serve
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Refer to https://documenter.getpostman.com/view/9034263/Tzm5HHBn for more information about the API. 
 
 ## Contributing
 
